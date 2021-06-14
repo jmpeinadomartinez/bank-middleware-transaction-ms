@@ -1,0 +1,9 @@
+
+entity MdwTransaction {
+    reference String required maxlength(6)
+    accountIban String required maxlength(100)
+    date ZonedDateTime
+    amount Double required 
+    fee Double
+    description String
+}
