@@ -1,0 +1,248 @@
+swagger: '2.0'
+#x-wso2-security:
+#  apim:
+#    x-wso2-scopes: []
+info:
+  description: transaction-microservice
+  title: bank-middleware-transaction-microservice
+  version: 1.0.0
+#basePath: /api/transaction
+#host: proyecto.empresa.es
+tags:
+  - name: Transaction
+    description: Transaction endpoints
+schemes:
+  - http
+#  - https
+#securityDefinitions:
+#  Bearer:
+#    in: header
+#    name: Authorization
+#    type: apiKey
+    
+paths:
+
+  '/transaction':
+    post:
+      summary: New transaction
+#      security:
+#        - Bearer: []
+      tags:
+        - Transaction
+      produces:
+        - application/json
+      consumes:
+        - application/json          
+      operationId: newTransaction
+      responses:
+        '200':
+          schema:
+            $ref: '#/definitions/NewTransactionResponse'
+          description: New transaction response
+        '400':
+          schema:
+            $ref: '#/definitions/ApiError'
+          description: InvalidqueryParameter
+        '500':
+          schema:
+            $ref: '#/definitions/ApiError'
+          description: Server error
+      parameters:
+        - schema:
+            $ref: '#/definitions/NewTransactionRequest'
+          in: body
+          name: newTransactionRequest
+          description: Payload to new transaction
+          required: true
+#      x-auth-type: Application & Application User          
+#      x-throttling-tier: Unlimited
+      
+  '/transaction/{iban}':
+    get:
+      summary: Get transaction saved for an iban sort by amount asc|desc
+#      security:
+#        - Bearer: []
+      tags:
+        - Transaction
+      produces:
+        - application/json
+      operationId: searchTransaction
+      responses:
+        '200':
+          schema:
+            $ref: '#/definitions/TransactionListResponse'
+          description: Search transaction response
+        '400':
+          schema:
+            $ref: '#/definitions/ApiError'
+          description: InvalidqueryParameter
+        '500':
+          schema:
+            $ref: '#/definitions/ApiError'
+          description: Server error
+      parameters:
+        - in: path
+          name: iban
+          type: string
+          description: iban account
+          required: true
+        - in: query
+          name: sort
+          description: Sort amount
+          type: string
+          enum: [ascending, descending]
+          required: true            
+        - in: query
+          name: page
+          type: integer
+          description: page number
+          required: false
+        - in: query
+          name: size
+          type: integer
+          description: size page
+          required: false
+#      x-auth-type: Application & Application User          
+#      x-throttling-tier: Unlimited   
+      
+  '/transaction/status':
+    get:
+      summary: Get transaction status for a reference
+#      security:
+#        - Bearer: []
+      tags:
+        - Transaction
+      produces:
+        - application/json
+      operationId: transactionStatus
+      responses:
+        '200':
+          schema:
+            $ref: '#/definitions/TransactionStatusResponse'
+          description: Search transaction response
+        '400':
+          schema:
+            $ref: '#/definitions/ApiError'
+          description: InvalidqueryParameter
+        '500':
+          schema:
+            $ref: '#/definitions/ApiError'
+          description: Server error
+      parameters:
+        - schema:
+            $ref: '#/definitions/TransactionStatusRequest'
+          in: body
+          name: newTransactionRequest
+          description: Payload to get status transaction
+          required: true   
+#      x-auth-type: Application & Application User          
+#      x-throttling-tier: Unlimited   
+
+definitions:
+
+  NewTransactionRequest:
+    description: New transaction object request
+    type: object
+    properties:
+      reference:
+        type: string
+      accountIban:
+        type: string    
+      date:
+        type: string
+      amount:
+        type: number
+        format: double         
+      fee:
+        type: number
+        format: double   
+      description:
+        type: string  
+    required:
+      - accountIban
+      - amount
+      
+  NewTransactionResponse:  
+    description: New transaction object response
+    type: object
+    properties:
+      reference:
+        type: string 
+    required:
+      - reference
+      
+  TransactionListResponse:
+    description: Transaction list response
+    type: object
+    properties:
+      totalTransaction:
+        description: 'Number of transactions'
+        type: integer
+        format: int32
+        default: 0
+      transactions:
+        type: array
+        description: 'Transactions list related to a iban'
+        items:
+          $ref: '#/definitions/Transaction' 
+      
+  Transaction:  
+    description: Transaction info object
+    type: object
+    properties:
+      reference:
+        type: string
+      accountIban:
+        type: string    
+      date:
+        type: string
+      amount:
+        type: number
+        format: double       
+      fee:
+        type: number
+        format: double  
+      description:
+        type: string  
+        
+  TransactionStatusRequest:
+    description: Transaction status object request
+    type: object
+    properties:
+      reference:
+        type: string
+      channel:
+        type: string
+        enum: [CLIENT, ATM, INTERNAL]
+    required:
+      - reference   
+              
+  TransactionStatusResponse:
+    description: Transaction status object response
+    type: object
+    properties:
+      reference:
+        type: string
+      status:
+        type: string    
+      amount:
+        type: number
+        format: double       
+      fee:
+        type: number
+        format: double   
+        
+  ApiError:
+    type: object
+    properties:
+      detail:
+        type: string
+      type:
+        type: string
+      title:
+        type: string
+      message:
+        type: string
+      status:
+        format: int32
+        type: integer
