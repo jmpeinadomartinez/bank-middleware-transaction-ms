@@ -32,15 +32,27 @@ Scenario: Return the status and additional information for a specific transactio
 ## Requeriments:
 Java 11
 
-## How to tun:
+## How to run:
 mvn spring-boot:run
 
 ## How to launch tests:
 mvn clean test
 
+## How to login to the H2 in-memory database:
+
+On your choice of browser, enter:
+
+* [http://localhost:8080/h2-console](http://localhost:8080/h2-console)
+
+Enter the following for:
+
+* JDBC URL: jdbc:h2:mem:transaction001
+* User Name: sa
+* Pasword: <leave this empty>
+
 ## Api-First
 
-Para la generación del código a partir del swagger se debe de utilizar el siguiente comando:
+To generate the code from the swagger, the following command must be used:
 
 mvn generate-sources
 
